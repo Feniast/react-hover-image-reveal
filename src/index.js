@@ -10,12 +10,16 @@ const wrapFunc = (func, oldFunc) => {
     if (oldFunc) oldFunc(...args);
     if (func) func(...args);
   };
-}
+};
+
+const isNumberLike = (value) => {
+  return (typeof value === 'number' && !isNaN(value)) || /^\d+$/.test(value);
+};
 
 const portalRoot = document.createElement('div');
 document.body.appendChild(portalRoot);
 
-export default class ExampleComponent extends Component {
+export default class HoverImageReveal extends Component {
   constructor(props) {
     super(props);
     this.enter = this.enter.bind(this);
@@ -31,9 +35,18 @@ export default class ExampleComponent extends Component {
 
   static propTypes = {
     children: PropTypes.element,
+    wrapperClass: PropTypes.string,
     imageSrc: PropTypes.string,
-    imageWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     zIndex: PropTypes.number
+  }
+
+  static defaultProps = {
+    width: '100px',
+    height: '100px',
+    zIndex: 1000,
+    wrapperClass: ''
   }
 
   enter(event) {
@@ -68,16 +81,21 @@ export default class ExampleComponent extends Component {
   }
 
   imgWrapperStyles() {
-    const { x, y } = this.state;
+    const { x, y, shown } = this.state;
+    let { width, height, zIndex } = this.props;
+    if (isNumberLike(width)) width = width + 'px';
+    if (isNumberLike(height)) height = height + 'px';
     return {
       position: 'absolute',
       left: `${x}px`,
-      top: `${y}px`
+      top: `${y}px`,
+      width,
+      height,
+      zIndex: shown ? zIndex : zIndex - 1
     };
   }
 
   bindEvents(child) {
-    console.log('ff');
     const {
       onMouseMove: oldMouseMove,
       onMouseEnter: oldMouseEnter,
@@ -95,18 +113,18 @@ export default class ExampleComponent extends Component {
 
   render() {
     const {
-      children
+      children,
+      wrapperClass
     } = this.props
+    if (!children) return null;
     const { shown } = this.state;
     const clonedChildren = React.Children.map(children, (child) => {
       return this.bindEvents(child);
     });
 
-    const imgEl = shown ? ReactDOM.createPortal(<div
-      style={this.imgWrapperStyles()}
-    >
+    const imgEl = ReactDOM.createPortal(<div className={wrapperClass} style={this.imgWrapperStyles()}>
       {Date.now()}
-    </div>, portalRoot) : null;
+    </div>, portalRoot);
 
     return <React.Fragment>{clonedChildren}{imgEl}</React.Fragment>;
   }
