@@ -1,16 +1,16 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 
-import ExampleComponent from 'react-hover-image-reveal'
+import ImageReveal from 'react-hover-image-reveal';
 
 export default class App extends Component {
-  render () {
+  render() {
     return <div>
-        <ExampleComponent>
+        <ImageReveal imgSrc="./assets/bruno-kelzer-1236813.jpg">
           <div onMouseEnter={e => console.log(e.nativeEvent)}>dff</div>
-        </ExampleComponent>
-        <ExampleComponent>
+        </ImageReveal>
+        <ImageReveal imgSrc="./assets/matthew-t-rader-1226659.jpg">
           <div onMouseEnter={e => console.log(e.nativeEvent)}>ee</div>
-        </ExampleComponent>
+        </ImageReveal>
       </div>;
   }
 }

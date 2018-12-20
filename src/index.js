@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import memoize from 'lodash.memoize';
-
-import styles from './styles.css'
+import Effect from './lib/effects/effect1';
 
 const wrapFunc = (func, oldFunc) => {
   return (...args) => {
@@ -12,12 +11,19 @@ const wrapFunc = (func, oldFunc) => {
   };
 };
 
-const isNumberLike = (value) => {
+const isNumberLike = value => {
   return (typeof value === 'number' && !isNaN(value)) || /^\d+$/.test(value);
 };
 
 const portalRoot = document.createElement('div');
 document.body.appendChild(portalRoot);
+
+const VISIBLE_STATE = {
+  HIDDEN: 0,
+  ENTER: 1,
+  SHOWN: 2,
+  LEAVE: 3
+};
 
 export default class HoverImageReveal extends Component {
   constructor(props) {
@@ -25,38 +31,47 @@ export default class HoverImageReveal extends Component {
     this.enter = this.enter.bind(this);
     this.move = this.move.bind(this);
     this.leave = this.leave.bind(this);
+    this.onShown = this.onShown.bind(this);
+    this.onHidden = this.onHidden.bind(this);
     this.bindEvents = memoize(this.bindEvents.bind(this));
     this.state = {
       shown: false,
       x: 0,
-      y: 0
+      y: 0,
+      visible: VISIBLE_STATE.HIDDEN
     };
   }
 
   static propTypes = {
     children: PropTypes.element,
     wrapperClass: PropTypes.string,
-    imageSrc: PropTypes.string,
+    imgSrc: PropTypes.string.isRequired,
     width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     zIndex: PropTypes.number
-  }
+  };
 
   static defaultProps = {
-    width: '100px',
-    height: '100px',
+    width: '200px',
+    height: '200px',
     zIndex: 1000,
     wrapperClass: ''
-  }
+  };
 
   enter(event) {
     const { x, y } = this.computePosition(event);
     this.setState({
       shown: true,
+      visible: VISIBLE_STATE.ENTER,
       x,
       y
     });
-    console.log('enter');
+  }
+
+  onShown() {
+    this.setState({
+      visible: VISIBLE_STATE.SHOWN
+    });
   }
 
   move(event) {
@@ -69,7 +84,14 @@ export default class HoverImageReveal extends Component {
 
   leave() {
     this.setState({
-      shown: false
+      shown: false,
+      visible: VISIBLE_STATE.LEAVE
+    });
+  }
+
+  onHidden() {
+    this.setState({
+      visible: VISIBLE_STATE.HIDDEN
     });
   }
 
@@ -80,9 +102,24 @@ export default class HoverImageReveal extends Component {
     };
   }
 
+  getZIndex() {
+    const { zIndex } = this.props;
+    const { visible } = this.state;
+    switch (visible) {
+      case VISIBLE_STATE.ENTER:
+      case VISIBLE_STATE.SHOWN:
+        return zIndex;
+      case VISIBLE_STATE.LEAVE:
+        return zIndex - 1;
+      case VISIBLE_STATE.HIDDEN:
+      default:
+        return '';
+    }
+  }
+
   imgWrapperStyles() {
-    const { x, y, shown } = this.state;
-    let { width, height, zIndex } = this.props;
+    const { x, y } = this.state;
+    let { width, height } = this.props;
     if (isNumberLike(width)) width = width + 'px';
     if (isNumberLike(height)) height = height + 'px';
     return {
@@ -91,7 +128,7 @@ export default class HoverImageReveal extends Component {
       top: `${y}px`,
       width,
       height,
-      zIndex: shown ? zIndex : zIndex - 1
+      zIndex: this.getZIndex()
     };
   }
 
@@ -112,20 +149,25 @@ export default class HoverImageReveal extends Component {
   }
 
   render() {
-    const {
-      children,
-      wrapperClass
-    } = this.props
+    const { children, wrapperClass, imgSrc } = this.props;
     if (!children) return null;
-    const { shown } = this.state;
-    const clonedChildren = React.Children.map(children, (child) => {
+    const { shown, visible } = this.state;
+    const clonedChildren = React.Children.map(children, child => {
       return this.bindEvents(child);
     });
 
-    const imgEl = ReactDOM.createPortal(<div className={wrapperClass} style={this.imgWrapperStyles()}>
-      {Date.now()}
-    </div>, portalRoot);
+    const imgEl = visible === VISIBLE_STATE.HIDDEN ? null : ReactDOM.createPortal(
+      <div className={wrapperClass} style={this.imgWrapperStyles()}>
+        <Effect shown={shown} imgSrc={imgSrc} onShown={this.onShown} onHidden={this.onHidden} />
+      </div>,
+      portalRoot
+    );
 
-    return <React.Fragment>{clonedChildren}{imgEl}</React.Fragment>;
+    return (
+      <React.Fragment>
+        {clonedChildren}
+        {imgEl}
+      </React.Fragment>
+    );
   }
 }
