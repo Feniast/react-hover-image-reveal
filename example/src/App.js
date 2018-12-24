@@ -2,15 +2,26 @@ import React, { Component } from 'react';
 
 import ImageReveal from 'react-hover-image-reveal';
 
+const images = [
+  "./assets/1.jpg",
+  "./assets/2.jpg"
+];
+
 export default class App extends Component {
   render() {
-    return <div>
-        <ImageReveal imgSrc="./assets/bruno-kelzer-1236813.jpg">
-          <div onMouseEnter={e => console.log(e.nativeEvent)}>dff</div>
-        </ImageReveal>
-        <ImageReveal imgSrc="./assets/matthew-t-rader-1226659.jpg">
-          <div onMouseEnter={e => console.log(e.nativeEvent)}>ee</div>
-        </ImageReveal>
-      </div>;
+    return (
+      <div className="content">
+        <div className="section">
+          <h2 className="section-title">Effect 1</h2>
+          <div className="section-item-list">
+            {images.map(((image, index) => (
+              <ImageReveal key={index} imgSrc={image} className="section-item">
+                <div>{`Item ${index+1}`}</div>
+              </ImageReveal>
+            )))}
+          </div>
+        </div>
+      </div>
+    );
   }
 }

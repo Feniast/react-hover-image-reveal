@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import memoize from 'lodash.memoize';
 import Effect from './lib/effects/effect1';
+import Effect2 from './lib/effects/effect2';
 
 const wrapFunc = (func, oldFunc) => {
   return (...args) => {
@@ -43,8 +44,10 @@ export default class HoverImageReveal extends Component {
   }
 
   static propTypes = {
-    children: PropTypes.element,
-    wrapperClass: PropTypes.string,
+    tag: PropTypes.string,
+    className: PropTypes.string,
+    children: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
+    imgWrapperClass: PropTypes.string,
     imgSrc: PropTypes.string.isRequired,
     width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -52,10 +55,12 @@ export default class HoverImageReveal extends Component {
   };
 
   static defaultProps = {
+    tag: 'div',
+    className: '',
     width: '200px',
-    height: '200px',
+    height: '150px',
     zIndex: 1000,
-    wrapperClass: ''
+    imgWrapperClass: ''
   };
 
   enter(event) {
@@ -149,23 +154,42 @@ export default class HoverImageReveal extends Component {
   }
 
   render() {
-    const { children, wrapperClass, imgSrc } = this.props;
+    const {
+      children,
+      imgWrapperClass,
+      imgSrc,
+      className,
+      tag: Tag
+    } = this.props;
     if (!children) return null;
     const { shown, visible } = this.state;
-    const clonedChildren = React.Children.map(children, child => {
-      return this.bindEvents(child);
-    });
-
-    const imgEl = visible === VISIBLE_STATE.HIDDEN ? null : ReactDOM.createPortal(
-      <div className={wrapperClass} style={this.imgWrapperStyles()}>
-        <Effect shown={shown} imgSrc={imgSrc} onShown={this.onShown} onHidden={this.onHidden} />
-      </div>,
-      portalRoot
-    );
+    const imgEl =
+      visible === VISIBLE_STATE.HIDDEN
+        ? null
+        : ReactDOM.createPortal(
+          <div className={imgWrapperClass} style={this.imgWrapperStyles()}>
+            <Effect2
+              shown={shown}
+              imgSrc={imgSrc}
+              onShown={this.onShown}
+              onHidden={this.onHidden}
+            />
+          </div>,
+          portalRoot
+        );
 
     return (
       <React.Fragment>
-        {clonedChildren}
+        {
+          <Tag
+            className={className}
+            onMouseMove={this.move}
+            onMouseEnter={this.enter}
+            onMouseLeave={this.leave}
+          >
+            {children}
+          </Tag>
+        }
         {imgEl}
       </React.Fragment>
     );
