@@ -21,6 +21,16 @@ export default class App extends Component {
             )))}
           </div>
         </div>
+        <div className="section">
+          <h2 className="section-title">Effect 2</h2>
+          <div className="section-item-list">
+            {images.map(((image, index) => (
+              <ImageReveal key={index} imgSrc={image} className="section-item" effect="2">
+                <div>{`Item ${index+1}`}</div>
+              </ImageReveal>
+            )))}
+          </div>
+        </div>
       </div>
     );
   }

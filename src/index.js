@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import memoize from 'lodash.memoize';
-import Effect from './lib/effects/effect1';
-import Effect2 from './lib/effects/effect2';
+import Effect from './lib/effects';
 
 const wrapFunc = (func, oldFunc) => {
   return (...args) => {
@@ -51,7 +50,8 @@ export default class HoverImageReveal extends Component {
     imgSrc: PropTypes.string.isRequired,
     width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    zIndex: PropTypes.number
+    zIndex: PropTypes.number,
+    effect: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   };
 
   static defaultProps = {
@@ -60,7 +60,8 @@ export default class HoverImageReveal extends Component {
     width: '200px',
     height: '150px',
     zIndex: 1000,
-    imgWrapperClass: ''
+    imgWrapperClass: '',
+    effect: 1
   };
 
   enter(event) {
@@ -159,7 +160,8 @@ export default class HoverImageReveal extends Component {
       imgWrapperClass,
       imgSrc,
       className,
-      tag: Tag
+      tag: Tag,
+      effect
     } = this.props;
     if (!children) return null;
     const { shown, visible } = this.state;
@@ -168,11 +170,12 @@ export default class HoverImageReveal extends Component {
         ? null
         : ReactDOM.createPortal(
           <div className={imgWrapperClass} style={this.imgWrapperStyles()}>
-            <Effect2
+            <Effect
               shown={shown}
               imgSrc={imgSrc}
               onShown={this.onShown}
               onHidden={this.onHidden}
+              effect={effect}
             />
           </div>,
           portalRoot

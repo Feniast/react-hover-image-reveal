@@ -7,7 +7,6 @@ import styles from './reveal.css';
 
 // use reset to force the animation restart
 // use unique to prevent the same items appear multiple times (it's something must be taken carefully and you don't want it to happen in most cases)
-// use duration-based animation to prevent some unexpected(weird) white lines from appearing on the image when the animation takes place
 const Effect = props => {
   const { shown, imgSrc, onShown, onHidden } = props;
   return (
@@ -33,12 +32,12 @@ const Effect = props => {
         (({ x1, x2 }) => (
           <animated.div
             className={styles.imgContainer}
-            style={{ transform: x1.interpolate(x1 => `translateX(${x1})`) }}
+            style={{ transform: x1.interpolate(x1 => `translate3d(${x1}, 0, 0)`) }}
           >
             <animated.img
               src={imgSrc}
               className={styles.img}
-              style={{ transform: x2.interpolate(x2 => `translateX(${x2})`) }}
+              style={{ transform: x2.interpolate(x2 => `translate3d(${x2}, 0, 0)`) }}
             />
           </animated.div>
         ))

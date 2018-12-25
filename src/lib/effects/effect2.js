@@ -1,103 +1,158 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Keyframes, animated, interpolate } from 'react-spring';
+import { Transition, animated, interpolate } from 'react-spring';
 import { easeExpOut } from 'd3-ease';
 
 import styles from './reveal.css';
 
-const Animation = Keyframes.Spring({
-  show: async next => {
-    const translate = next({
-      from: {
-        x: '50%',
-        y: '120%',
-        rotate: 50
-      },
-      x: '0%',
-      y: '0%',
-      rotate: 0,
-      config: {
-        duration: 400,
-        ease: easeExpOut
-      },
-      reset: true
-    });
+const containerFrom = {
+  x: 50,
+  y: 120,
+  rotate: 50
+};
 
-    const scale = next({
-      from: { scale: 2 },
-      scale: 1,
-      config: {
-        duration: 700,
-        ease: easeExpOut
-      },
-      reset: true
-    });
+const containerEnter = {
+  x: 0,
+  y: 0,
+  rotate: 0
+};
 
-    await Promise.all([translate, scale]);
-  },
-  hide: {
-    y: '120%',
-    rotate: 5,
-    scale: 1.2,
-    config: {
-      duration: 600,
-      ease: easeExpOut
-    }
+const containerLeave = {
+  y: -120,
+  rotate: -5
+};
+
+const imageFrom = {
+  scale: 2
+};
+
+const imageEnter = {
+  scale: 1
+};
+
+const imageLeave = {
+  scale: 1.2
+};
+
+class ShowTransitionEffect extends React.PureComponent {
+  static propTypes = {
+    shown: PropTypes.bool.isRequired,
+    from: PropTypes.object,
+    enter: PropTypes.object,
+    leave: PropTypes.object,
+    config: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
+    onShown: PropTypes.func,
+    onHidden: PropTypes.func,
+    children: PropTypes.func
+  };
+
+  render() {
+    const { shown, onShown, onHidden, children, ...rest } = this.props;
+    return (
+      <Transition
+        native
+        unique
+        reset
+        items={shown}
+        {...rest}
+        onRest={() => {
+          if (shown) {
+            onShown && onShown();
+          } else {
+            onHidden && onHidden();
+          }
+        }}
+      >
+        {shown => shown && children}
+      </Transition>
+    );
   }
-});
+}
 
-const Effect = props => {
-  const { shown, imgSrc, onShown, onHidden } = props;
-  return (
-    <Animation
-      native
-      state={shown ? 'show' : 'hide'}
-      onRest={() => {
-        if (shown) {
-          onShown && onShown();
-        } else {
-          onHidden && onHidden();
-        }
-      }}
-    >
-      {({ x, y, rotate, scale }) => (
-        <animated.div
-          className={styles.imgContainer}
-          style={{
-            transformOrigin: '50% 100%',
-            transform: interpolate(
-              [x, y, rotate],
-              (x, y, rotate) => `translate(${x}, ${y}) rotate(${rotate}deg)`
-            )
-          }}
-        >
-          <animated.img
-            src={imgSrc}
-            className={styles.img}
-            style={{
-              transformOrigin: '50% 100%',
-              transform: interpolate(
-                [x, y, rotate, scale],
-                (x, y, rotate, scale) =>
-                  `translate(-${x}, -${y}) rotate(-${rotate}deg) scale(${scale})`
-              )
-            }}
-          />
-        </animated.div>
-      )}
-    </Animation>
-  );
-};
+class TransitionEffect extends React.PureComponent {
+  static propTypes = {
+    shown: PropTypes.bool.isRequired,
+    imgSrc: PropTypes.string.isRequired,
+    onShown: PropTypes.func,
+    onHidden: PropTypes.func
+  };
 
-Effect.propTypes = {
-  shown: PropTypes.bool.isRequired,
-  imgSrc: PropTypes.string.isRequired,
-  onShown: PropTypes.func,
-  onHidden: PropTypes.func
-};
+  static defaultProps = {
+    shown: false
+  };
 
-Effect.defaultProps = {
-  shown: false
-};
+  getContainerTransitionConfig(_, type) {
+    const duration = type === 'enter' ? 300 : 200;
+    return {
+      duration,
+      ease: easeExpOut
+    };
+  }
 
-export default Effect;
+  getImageTransitionConfig(_, type) {
+    const duration = type === 'enter' ? 400 : 200;
+    return {
+      duration,
+      ease: easeExpOut
+    };
+  }
+
+  render() {
+    const { shown, imgSrc, onShown, onHidden } = this.props;
+    return (
+      <ShowTransitionEffect
+        config={this.getContainerTransitionConfig}
+        from={containerFrom}
+        enter={containerEnter}
+        leave={containerLeave}
+        shown={shown}
+        onShown={onShown}
+        onHidden={onHidden}
+      >
+        {({ x, y, rotate }) => {
+          return (
+            <div className={styles.imgContainer}>
+              <animated.div
+                className={styles.imgContainer}
+                style={{
+                  transformOrigin: '50% 100%',
+                  transform: interpolate(
+                    [x, y, rotate],
+                    (x, y, rotate) =>
+                      `translate(${x}%, ${y}%) rotate(${rotate}deg)`
+                  )
+                }}
+              >
+                <ShowTransitionEffect
+                  config={this.getImageTransitionConfig}
+                  from={imageFrom}
+                  enter={imageEnter}
+                  leave={imageLeave}
+                  shown={shown}
+                >
+                  {({ scale }) => (
+                    <animated.img
+                      src={imgSrc}
+                      className={styles.img}
+                      style={{
+                        transformOrigin: '50% 100%',
+                        transform: interpolate(
+                          [x, y, rotate, scale],
+                          (x, y, rotate, scale) => {
+                            return `translate(${-x}%, ${-y}%) rotate(${-rotate}deg) scale(${scale})`
+                          }
+                        )
+                      }}
+                    />
+                  )}
+                </ShowTransitionEffect>
+              </animated.div>
+            </div>
+          );
+        }}
+      </ShowTransitionEffect>
+    );
+  }
+}
+
+export default TransitionEffect;
