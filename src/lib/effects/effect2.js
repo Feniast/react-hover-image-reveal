@@ -41,12 +41,12 @@ class TransitionEffect extends React.PureComponent {
   static defaultProps = commonDefaultProps;
 
   getContainerTransitionConfig(_, type) {
-    const duration = type === 'enter' ? 400 : 200;
+    const duration = type === 'enter' ? 400 : 600;
     return { duration, easing: easeExpOut };
   }
 
   getImageTransitionConfig(_, type) {
-    const duration = type === 'enter' ? 700 : 200;
+    const duration = type === 'enter' ? 700 : 600;
     return { duration, easing: easeExpOut };
   }
 
