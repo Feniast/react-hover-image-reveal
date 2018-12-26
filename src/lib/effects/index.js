@@ -2,10 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Effect1 from './effect1';
 import Effect2 from './effect2';
+import Effect3 from './effect3';
 
 const effectMap = {
   1: Effect1,
-  2: Effect2
+  2: Effect2,
+  3: Effect3
 };
 
 class Effect extends React.PureComponent {

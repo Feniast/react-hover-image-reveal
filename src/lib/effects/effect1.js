@@ -7,7 +7,7 @@ import styles from './reveal.css';
 
 // use reset to force the animation restart
 // use unique to prevent the same items appear multiple times (it's something must be taken carefully and you don't want it to happen in most cases)
-const Effect = props => {
+const TransitionEffect = props => {
   const { shown, imgSrc, onShown, onHidden } = props;
   return (
     <Transition
@@ -15,7 +15,7 @@ const Effect = props => {
       unique
       items={shown}
       reset
-      config={{ duration: 200, ease: easeSinOut }}
+      config={{ duration: 200, easing: easeSinOut }}
       from={{ x1: '-100%', x2: '100%' }}
       enter={{ x1: '0%', x2: '0%' }}
       leave={{ x1: '100%', x2: '-100%' }}
@@ -47,15 +47,15 @@ const Effect = props => {
   );
 };
 
-Effect.propTypes = {
+TransitionEffect.propTypes = {
   shown: PropTypes.bool.isRequired,
   imgSrc: PropTypes.string.isRequired,
   onShown: PropTypes.func,
   onHidden: PropTypes.func
 };
 
-Effect.defaultProps = {
+TransitionEffect.defaultProps = {
   shown: false
 };
 
-export default Effect;
+export default TransitionEffect;

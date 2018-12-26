@@ -1,7 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { Transition, animated, interpolate } from 'react-spring';
+import { animated, interpolate } from 'react-spring';
 import { easeExpOut } from 'd3-ease';
+import ShowTransitionEffect from './ShowTransitionEffect';
+import { commonProps, commonDefaultProps } from './props';
 
 import styles from './reveal.css';
 
@@ -34,67 +35,19 @@ const imageLeave = {
   scale: 1.2
 };
 
-class ShowTransitionEffect extends React.PureComponent {
-  static propTypes = {
-    shown: PropTypes.bool.isRequired,
-    from: PropTypes.object,
-    enter: PropTypes.object,
-    leave: PropTypes.object,
-    config: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
-    onShown: PropTypes.func,
-    onHidden: PropTypes.func,
-    children: PropTypes.func
-  };
-
-  render() {
-    const { shown, onShown, onHidden, children, ...rest } = this.props;
-    return (
-      <Transition
-        native
-        unique
-        reset
-        items={shown}
-        {...rest}
-        onRest={() => {
-          if (shown) {
-            onShown && onShown();
-          } else {
-            onHidden && onHidden();
-          }
-        }}
-      >
-        {shown => shown && children}
-      </Transition>
-    );
-  }
-}
-
 class TransitionEffect extends React.PureComponent {
-  static propTypes = {
-    shown: PropTypes.bool.isRequired,
-    imgSrc: PropTypes.string.isRequired,
-    onShown: PropTypes.func,
-    onHidden: PropTypes.func
-  };
+  static propTypes = commonProps;
 
-  static defaultProps = {
-    shown: false
-  };
+  static defaultProps = commonDefaultProps;
 
   getContainerTransitionConfig(_, type) {
-    const duration = type === 'enter' ? 300 : 200;
-    return {
-      duration,
-      ease: easeExpOut
-    };
+    const duration = type === 'enter' ? 400 : 200;
+    return { duration, easing: easeExpOut };
   }
 
   getImageTransitionConfig(_, type) {
-    const duration = type === 'enter' ? 400 : 200;
-    return {
-      duration,
-      ease: easeExpOut
-    };
+    const duration = type === 'enter' ? 700 : 200;
+    return { duration, easing: easeExpOut };
   }
 
   render() {
@@ -139,7 +92,7 @@ class TransitionEffect extends React.PureComponent {
                         transform: interpolate(
                           [x, y, rotate, scale],
                           (x, y, rotate, scale) => {
-                            return `translate(${-x}%, ${-y}%) rotate(${-rotate}deg) scale(${scale})`
+                            return `translate(${-x}%, ${-y}%) rotate(${-rotate}deg) scale(${scale})`;
                           }
                         )
                       }}
