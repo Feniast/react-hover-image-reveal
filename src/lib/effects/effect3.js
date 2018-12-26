@@ -48,7 +48,7 @@ export default class TransitionEffect extends React.PureComponent {
         from={from}
         enter={enter}
         leave={leave}
-        config={{}}
+        config={this.getTransitionConfig}
         shown={shown}
         onHidden={onHidden}
         onShown={onShown}
