@@ -10,3 +10,13 @@ export const commonProps = {
 export const commonDefaultProps = {
   shown: false
 };
+
+export const propsWithDeco = {
+  ...commonProps,
+  bgColor: PropTypes.string
+};
+
+export const defaultPropsWithDeco = {
+  ...commonDefaultProps,
+  bgColor: '#181314'
+};

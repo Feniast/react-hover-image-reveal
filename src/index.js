@@ -158,10 +158,9 @@ export default class HoverImageReveal extends Component {
     const {
       children,
       imgWrapperClass,
-      imgSrc,
       className,
       tag: Tag,
-      effect
+      ...rest
     } = this.props;
     if (!children) return null;
     const { shown, visible } = this.state;
@@ -172,10 +171,9 @@ export default class HoverImageReveal extends Component {
           <div className={imgWrapperClass} style={this.imgWrapperStyles()}>
             <Effect
               shown={shown}
-              imgSrc={imgSrc}
               onShown={this.onShown}
               onHidden={this.onHidden}
-              effect={effect}
+              {...rest}
             />
           </div>,
           portalRoot
