@@ -1,111 +1,72 @@
-import React from 'react';
-import { animated, interpolate } from 'react-spring';
-import { easeExpOut } from 'd3-ease';
-import ShowTransitionEffect from './ShowTransitionEffect';
-import { commonProps, commonDefaultProps } from './props';
+import EffectFactory from './base-effect';
+import { expoEaseOut } from './cubic-bezier';
+import { injectTransition } from '../util';
 
 import styles from './reveal.css';
 
-const containerFrom = {
-  x: 50,
-  y: 120,
-  rotate: 50
+const containerEnterTransition = {
+  duration: 400,
+  ease: expoEaseOut
 };
 
-const containerEnter = {
-  x: 0,
-  y: 0,
-  rotate: 0
+const imgEnterTransition = {
+  duration: 700,
+  ease: expoEaseOut
 };
 
-const containerLeave = {
-  y: -120,
-  rotate: -5
+const leaveTransition = {
+  duration: 600,
+  ease: expoEaseOut
 };
 
-const imageFrom = {
-  scale: 2
-};
-
-const imageEnter = {
-  scale: 1
-};
-
-const imageLeave = {
-  scale: 1.2
-};
-
-class TransitionEffect extends React.PureComponent {
-  static propTypes = commonProps;
-
-  static defaultProps = commonDefaultProps;
-
-  getContainerTransitionConfig(_, type) {
-    const duration = type === 'enter' ? 400 : 600;
-    return { duration, easing: easeExpOut };
+const containerConfig = {
+  show: {
+    x: '0%',
+    y: '0%',
+    rotate: 0,
+    transition: injectTransition({
+      x: { from: '50%' },
+      y: { from: '120%' },
+      rotate: { from: 50 }
+    }, containerEnterTransition)
+  },
+  hide: {
+    y: '-120%',
+    rotate: -5,
+    transition: leaveTransition
   }
+};
 
-  getImageTransitionConfig(_, type) {
-    const duration = type === 'enter' ? 700 : 600;
-    return { duration, easing: easeExpOut };
+const imgConfig = {
+  show: {
+    x: '0%',
+    y: '0%',
+    rotate: 0,
+    scale: 1,
+    transition: {
+      ...injectTransition({
+        x: { from: '-50%' },
+        y: { from: '-120%' },
+        rotate: { from: -50 }
+      }, containerEnterTransition),
+      ...injectTransition({
+        scale: { from: 2 }
+      }, imgEnterTransition)
+    }
+  },
+  hide: {
+    y: '120%',
+    rotate: 5,
+    scale: 1.2,
+    transition: leaveTransition
   }
+};
 
-  render() {
-    const { shown, imgSrc, onShown, onHidden } = this.props;
-    return (
-      <ShowTransitionEffect
-        config={this.getContainerTransitionConfig}
-        from={containerFrom}
-        enter={containerEnter}
-        leave={containerLeave}
-        shown={shown}
-        onShown={onShown}
-        onHidden={onHidden}
-      >
-        {({ x, y, rotate }) => {
-          return (
-            <div className={styles.imgContainer}>
-              <animated.div
-                className={styles.imgContainer}
-                style={{
-                  transformOrigin: '50% 100%',
-                  transform: interpolate(
-                    [x, y, rotate],
-                    (x, y, rotate) =>
-                      `translate(${x}%, ${y}%) rotate(${rotate}deg)`
-                  )
-                }}
-              >
-                <ShowTransitionEffect
-                  config={this.getImageTransitionConfig}
-                  from={imageFrom}
-                  enter={imageEnter}
-                  leave={imageLeave}
-                  shown={shown}
-                >
-                  {({ scale }) => (
-                    <animated.img
-                      src={imgSrc}
-                      className={styles.img}
-                      style={{
-                        transformOrigin: '50% 100%',
-                        transform: interpolate(
-                          [x, y, rotate, scale],
-                          (x, y, rotate, scale) => {
-                            return `translate(${-x}%, ${-y}%) rotate(${-rotate}deg) scale(${scale})`;
-                          }
-                        )
-                      }}
-                    />
-                  )}
-                </ShowTransitionEffect>
-              </animated.div>
-            </div>
-          );
-        }}
-      </ShowTransitionEffect>
-    );
-  }
-}
-
-export default TransitionEffect;
+export default EffectFactory({
+  containerConfig,
+  imgConfig,
+  containerStyles: { transformOrigin: '50% 100%' },
+  imgStyles: { transformOrigin: '50% 100%' },
+  hasWrapper: true,
+  wrapperClass: styles.imgContainer
+});

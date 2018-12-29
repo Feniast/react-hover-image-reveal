@@ -1,126 +1,88 @@
 import React from 'react';
-import { animated, interpolate } from 'react-spring';
-import { easeExpOut } from 'd3-ease';
-import ShowTransitionEffect from './ShowTransitionEffect';
+import posed from 'react-pose';
 import { propsWithDeco, defaultPropsWithDeco } from './props';
+import { expoEaseOut } from './cubic-bezier';
+import { createTransitionConfig } from '../util';
 
 import styles from './reveal.css';
 
-const bgFrom = {
-  opacity: 0,
-  rotate: 35,
-  scale: 0
+const bgEnterTransition = {
+  duration: 800,
+  ease: expoEaseOut
 };
 
-const bgEnter = {
-  opacity: 1,
-  rotate: 0,
-  scale: 1
+const imgEnterTransition = {
+  duration: 800,
+  delay: 150,
+  ease: expoEaseOut
 };
 
-const bgLeave = {
-  opacity: 0,
-  scale: 0.9
+const leaveTransition = {
+  duration: 300,
+  ease: expoEaseOut
 };
 
-const imgFrom = {
-  opacity: 0,
-  rotate: 35,
-  outerScale: 0,
-  innerScale: 2
-};
+const Bg = posed.div({
+  show: createTransitionConfig({
+    opacity: [0, 1],
+    rotate: [35, 0],
+    scale: [0, 1]
+  }, bgEnterTransition),
+  hide: {
+    opacity: 0,
+    scale: 0.9,
+    transition: leaveTransition
+  }
+});
 
-const imgEnter = {
-  opacity: 1,
-  rotate: 0,
-  outerScale: 1,
-  innerScale: 1
-};
+const ImgContainer = posed.div({
+  initial: { opacity: 0 },
+  show: createTransitionConfig({
+    opacity: [0, 1],
+    rotate: [35, 0],
+    scale: [0, 1]
+  }, imgEnterTransition),
+  hide: {
+    opacity: 0,
+    scale: 0.9,
+    transition: leaveTransition
+  }
+});
 
-const imgLeave = {
-  opacity: 0,
-  outerScale: 0.9
-};
+const Img = posed.img({
+  show: createTransitionConfig({
+    rotate: [-35, 0],
+    scale: [2, 1]
+  }, imgEnterTransition),
+  hide: {}
+});
 
 export default class TransitionEffect extends React.PureComponent {
   static propTypes = propsWithDeco;
 
   static defaultProps = defaultPropsWithDeco;
 
-  getBgTransitionConfig(_, type) {
-    return type === 'enter'
-      ? { duration: 800, easing: easeExpOut }
-      : { duration: 200, easing: easeExpOut };
-  }
-
-  getImgTranstionConfig(_, type) {
-    return type === 'enter'
-      ? { duration: 800, easing: easeExpOut, delay: 150 }
-      : { duration: 200, easing: easeExpOut };
-  }
-
   render() {
     const { shown, bgColor, onShown, onHidden, imgSrc } = this.props;
     return (
       <>
-        <ShowTransitionEffect
-          from={bgFrom}
-          enter={bgEnter}
-          leave={bgLeave}
-          config={this.getBgTransitionConfig}
-          shown={shown}
+        <Bg
+          initialPose='initial'
+          pose={shown ? 'show' : 'hide'}
+          className={styles.imgBg}
+          style={{ backgroundColor: bgColor }}
+        />
+        <ImgContainer
+          className={styles.imgContainer}
+          initialPose='initial'
+          pose={shown ? 'show' : 'hide'}
+          onPoseComplete={() => {
+            if (shown) onShown && onShown();
+            else onHidden && onHidden();
+          }}
         >
-          {({ opacity, rotate, scale }) => (
-            <animated.div
-              className={styles.imgBg}
-              style={{
-                backgroundColor: bgColor,
-                opacity,
-                transform: interpolate(
-                  [rotate, scale],
-                  (rotate, scale) => { return `rotate(${rotate}deg) scale(${scale})`; }
-                )
-              }}
-            />
-          )}
-        </ShowTransitionEffect>
-        <ShowTransitionEffect
-          shown={shown}
-          from={imgFrom}
-          enter={imgEnter}
-          leave={imgLeave}
-          config={this.getImgTranstionConfig}
-          onShown={onShown}
-          onHidden={onHidden}
-        >
-          {({ opacity, rotate, innerScale, outerScale }) => (
-            <animated.div
-              className={[styles.imgContainer, styles.hidden].join(' ')}
-              style={{
-                opacity,
-                transform: interpolate(
-                  [rotate, outerScale],
-                  (rotate, outerScale) => {
-                    console.log(rotate, outerScale);
-                    return `rotate(${rotate}deg) scale(${outerScale})`
-                  }
-                )
-              }}
-            >
-              <animated.img
-                className={styles.img}
-                src={imgSrc}
-                style={{
-                  transform: interpolate(
-                    [rotate, innerScale],
-                    (rotate, innerScale) =>
-                      `rotate(${-rotate}deg) scale(${innerScale})`
-                  )
-                }}
-              />
-            </animated.div>
-          )}
-        </ShowTransitionEffect>
+          <Img src={imgSrc} className={styles.img} />
+        </ImgContainer>
       </>
     );
   }

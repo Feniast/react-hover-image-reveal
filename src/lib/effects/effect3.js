@@ -1,85 +1,58 @@
-import React from 'react';
-import { animated, interpolate } from 'react-spring';
-import { easeExpOut, easeSinOut } from 'd3-ease';
-import ShowTransitionEffect from './ShowTransitionEffect';
-import { commonProps, commonDefaultProps } from './props';
+import EffectFactory from './base-effect';
+import { expoEaseOut, sineEaseOut } from './cubic-bezier';
+import { injectTransition } from '../util';
 
-import styles from './reveal.css';
-
-const from = {
-  opacity: 0,
-  y: 50,
-  rotate: -15,
-  outerScale: 0,
-  innerScale: 2
+const enterTransition = {
+  duration: 800,
+  ease: expoEaseOut
 };
 
-const enter = {
-  opacity: 1,
-  y: 0,
-  rotate: 0,
-  outerScale: 1,
-  innerScale: 1
+const leaveTransition = {
+  duration: 150,
+  ease: sineEaseOut
 };
 
-const leave = {
-  opacity: 0,
-  y: -40,
-  rotate: 10,
-  outerScale: 0.9,
-  innerScale: 1.5
-};
-
-export default class TransitionEffect extends React.PureComponent {
-  static propTypes = commonProps;
-
-  static defaultProps = commonDefaultProps;
-
-  getTransitionConfig(_, type) {
-    const duration = type === 'enter' ? 800 : 150;
-    const easing = type === 'enter' ? easeExpOut : easeSinOut;
-    return { duration, easing };
+const containerConfig = {
+  initial: {},
+  show: {
+    opacity: 1,
+    rotate: 0,
+    y: '0%',
+    scale: 1,
+    transition: injectTransition({
+      opacity: { from: 0 },
+      rotate: { from: -15 },
+      y: { from: '50%' },
+      scale: { from: 0 }
+    }, enterTransition)
+  },
+  hide: {
+    opacity: 0,
+    y: '-40%',
+    rotate: 10,
+    scale: 0.9,
+    transition: leaveTransition
   }
+};
 
-  render() {
-    const { shown, imgSrc, onShown, onHidden } = this.props;
-    return (
-      <ShowTransitionEffect
-        from={from}
-        enter={enter}
-        leave={leave}
-        config={this.getTransitionConfig}
-        shown={shown}
-        onHidden={onHidden}
-        onShown={onShown}
-      >
-        {({ opacity, y, rotate, outerScale, innerScale }) => (
-          <animated.div
-            className={styles.imgContainer}
-            style={{
-              opacity,
-              transform: interpolate(
-                [y, rotate, outerScale],
-                (y, rotate, outerScale) =>
-                  `translate3d(0, ${y}%, 0) rotate(${rotate}deg) scale(${outerScale})`
-              )
-            }}
-          >
-            <animated.img
-              src={imgSrc}
-              className={styles.img}
-              style={{
-                transform: interpolate(
-                  [rotate, innerScale],
-                  (rotate, innerScale) => {
-                    return `rotate(${-rotate}deg) scale(${innerScale})`;
-                  }
-                )
-              }}
-            />
-          </animated.div>
-        )}
-      </ShowTransitionEffect>
-    );
+const imgConfig = {
+  initial: {},
+  show: {
+    rotate: 0,
+    scale: 1,
+    transition: injectTransition({
+      rotate: { from: 15 },
+      scale: { from: 2 }
+    }, enterTransition)
+  },
+  hide: {
+    rotate: -10,
+    scale: 1.5,
+    transition: leaveTransition
   }
-}
+};
+
+export default EffectFactory({
+  containerConfig,
+  imgConfig
+});
