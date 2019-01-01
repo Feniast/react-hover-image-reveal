@@ -1,6 +1,6 @@
 import EffectFactory from './base-effect';
 import { expoEaseOut } from './cubic-bezier';
-import { injectTransition } from '../util';
+import { injectTransition, createTransitionConfig } from '../util';
 
 import styles from './reveal.css';
 
@@ -20,16 +20,11 @@ const leaveTransition = {
 };
 
 const containerConfig = {
-  show: {
-    x: '0%',
-    y: '0%',
-    rotate: 0,
-    transition: injectTransition({
-      x: { from: '50%' },
-      y: { from: '120%' },
-      rotate: { from: 50 }
-    }, containerEnterTransition)
-  },
+  show: createTransitionConfig({
+    x: ['50%', '0%'],
+    y: ['120%', '0%'],
+    rotate: [50, 0]
+  }, containerEnterTransition),
   hide: {
     y: '-120%',
     rotate: -5,
