@@ -7,6 +7,15 @@ const images = ['./assets/1.jpg', './assets/2.jpg'];
 const effectNum = 5;
 
 const extraPropsMap = {
+  1: {
+    position: 'top-left'
+  },
+  2: {
+    position: 'top-right'
+  },
+  3: {
+    position: 'bottom-left'
+  },
   4: {
     bgColor: 'black'
   },

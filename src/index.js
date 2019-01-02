@@ -46,6 +46,7 @@ export default class HoverImageReveal extends Component {
     tag: PropTypes.string,
     className: PropTypes.string,
     children: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
+    position: PropTypes.oneOf(['top-left', 'bottom-left', 'top-right', 'bottom-right']),
     imgWrapperClass: PropTypes.string,
     imgSrc: PropTypes.string.isRequired,
     width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -57,6 +58,7 @@ export default class HoverImageReveal extends Component {
   static defaultProps = {
     tag: 'div',
     className: '',
+    position: 'bottom-right',
     width: '200px',
     height: '150px',
     zIndex: 1000,
@@ -65,12 +67,11 @@ export default class HoverImageReveal extends Component {
   };
 
   enter(event) {
-    const { x, y } = this.computePosition(event);
+    const pos = this.computePosition(event);
     this.setState({
       shown: true,
       visible: VISIBLE_STATE.ENTER,
-      x,
-      y
+      ...pos
     });
   }
 
@@ -81,10 +82,9 @@ export default class HoverImageReveal extends Component {
   }
 
   move(event) {
-    const { x, y } = this.computePosition(event);
+    const pos = this.computePosition(event);
     this.setState({
-      x,
-      y
+      ...pos
     });
   }
 
@@ -102,10 +102,34 @@ export default class HoverImageReveal extends Component {
   }
 
   computePosition(event) {
-    return {
-      x: event.clientX + 20,
-      y: event.clientY + 20
-    };
+    const { clientX, clientY } = event;
+    const { position } = this.props;
+    switch (position) {
+      case 'top-left':
+        return {
+          x: `${clientX - 20}px`,
+          y: `${clientY - 20}px`,
+          transform: 'translate(-100%, -100%)'
+        };
+      case 'top-right':
+        return {
+          x: `${clientX + 20}px`,
+          y: `${clientY - 20}px`,
+          transform: 'translate(0%, -100%)'
+        };
+      case 'bottom-left':
+        return {
+          x: `${clientX - 20}px`,
+          y: `${clientY + 20}px`,
+          transform: 'translate(-100%, 0%)'
+        };
+      case 'bottom-right':
+      default:
+        return {
+          x: `${clientX + 20}px`,
+          y: `${clientY + 20}px`
+        };
+    }
   }
 
   getZIndex() {
@@ -124,16 +148,17 @@ export default class HoverImageReveal extends Component {
   }
 
   imgWrapperStyles() {
-    const { x, y } = this.state;
+    const { x, y, transform } = this.state;
     let { width, height } = this.props;
     if (isNumberLike(width)) width = width + 'px';
     if (isNumberLike(height)) height = height + 'px';
     return {
       position: 'absolute',
-      left: `${x}px`,
-      top: `${y}px`,
+      left: x,
+      top: y,
       width,
       height,
+      transform: transform || 'none',
       zIndex: this.getZIndex()
     };
   }
