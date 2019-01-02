@@ -4,12 +4,14 @@ import Effect1 from './effect1';
 import Effect2 from './effect2';
 import Effect3 from './effect3';
 import Effect4 from './effect4';
+import Effect5 from './effect5';
 
 const effectMap = {
   1: Effect1,
   2: Effect2,
   3: Effect3,
-  4: Effect4
+  4: Effect4,
+  5: Effect5
 };
 
 class Effect extends React.PureComponent {

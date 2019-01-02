@@ -69,6 +69,7 @@
   "dependencies": {
     "d3-ease": "^1.0.5",
     "lodash.memoize": "^4.1.2",
+    "popmotion": "^8.5.5",
     "react-pose": "^4.0.4",
     "react-spring": "^7.2.1"
   }

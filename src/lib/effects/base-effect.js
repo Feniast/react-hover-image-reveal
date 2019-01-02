@@ -10,11 +10,13 @@ const EffectComponentFactory = ({
   containerStyles,
   imgStyles,
   hasWrapper,
+  wrapperConfig,
   wrapperClass,
   wrapperStyles
 }) => {
   const ImgContainer = posed.div(containerConfig);
   const Img = posed.img(imgConfig);
+  const Wrapper = posed.div(wrapperConfig || {});
   containerStyles = containerStyles || {};
   imgStyles = imgStyles || {};
   wrapperStyles = wrapperStyles || {};
@@ -40,22 +42,31 @@ const EffectComponentFactory = ({
 
     render() {
       const { shown, imgSrc } = this.props;
+      const poseConfig = {
+        initialPose: 'initial',
+        pose: shown ? 'show' : 'hide',
+        onPoseComplete: this.onComplete
+      };
       const content = (
         <ImgContainer
-          initialPose='initial'
-          pose={shown ? 'show' : 'hide'}
           style={containerStyles}
           className={styles.imgContainer}
-          onPoseComplete={this.onComplete}
+          {...(hasWrapper ? {} : poseConfig)}
         >
           <Img src={imgSrc} style={imgStyles} className={styles.img} />
         </ImgContainer>
       );
       return hasWrapper ? (
-        <div className={wrapperClass} style={wrapperStyles}>
+        <Wrapper
+          className={wrapperClass}
+          style={wrapperStyles}
+          {...poseConfig}
+        >
           {content}
-        </div>
-      ) : content;
+        </Wrapper>
+      ) : (
+        content
+      );
     }
   };
 

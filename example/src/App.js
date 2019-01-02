@@ -4,7 +4,16 @@ import ImageReveal from 'react-hover-image-reveal';
 
 const images = ['./assets/1.jpg', './assets/2.jpg'];
 
-const effectNum = 4;
+const effectNum = 5;
+
+const extraPropsMap = {
+  4: {
+    bgColor: 'black'
+  },
+  5: {
+    bgColor: 'white'
+  }
+};
 
 export default class App extends Component {
   render() {
@@ -15,10 +24,7 @@ export default class App extends Component {
             <h2 className="section-title">{`Effect ${idx + 1}`}</h2>
             <div className="section-item-list">
               {images.map((image, index) => {
-                let extraProps = {};
-                if (idx + 1 === 4) {
-                  extraProps.bgColor = 'black';
-                }
+                let extraProps = extraPropsMap[idx + 1] || {};
                 return (
                   <ImageReveal
                     key={index}
