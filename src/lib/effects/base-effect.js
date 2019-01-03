@@ -12,7 +12,10 @@ const EffectComponentFactory = ({
   hasWrapper,
   wrapperConfig,
   wrapperClass,
-  wrapperStyles
+  wrapperStyles,
+  hasBg,
+  bgConfig,
+  bgStyles
 }) => {
   const ImgContainer = posed.div(containerConfig);
   const Img = posed.img(imgConfig);

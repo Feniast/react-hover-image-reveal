@@ -29,11 +29,11 @@ export default {
     }),
     url(),
     svgr(),
+    resolve(),
     babel({
       exclude: 'node_modules/**',
       runtimeHelpers: true
     }),
-    resolve(),
     commonjs()
   ]
 }

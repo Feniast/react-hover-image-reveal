@@ -28,7 +28,7 @@ export default class App extends Component {
   render() {
     return (
       <div className="content">
-        {new Array(effectNum).fill(0).map((_, idx) => (
+        {[...new Array(effectNum)].map((_, idx) => (
           <div className="section">
             <h2 className="section-title">{`Effect ${idx + 1}`}</h2>
             <div className="section-item-list">
