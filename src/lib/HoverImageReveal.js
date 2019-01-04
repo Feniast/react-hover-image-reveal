@@ -153,7 +153,7 @@ export default class HoverImageReveal extends Component {
     if (isNumberLike(width)) width = width + 'px';
     if (isNumberLike(height)) height = height + 'px';
     return {
-      position: 'absolute',
+      position: 'fixed',
       left: x,
       top: y,
       width,
