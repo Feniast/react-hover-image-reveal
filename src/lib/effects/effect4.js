@@ -73,7 +73,7 @@ export default class TransitionEffect extends React.PureComponent {
           style={{ backgroundColor: bgColor }}
         />
         <ImgContainer
-          className={styles.imgContainer}
+          className={styles.imgContainerNoOverflow}
           initialPose='initial'
           pose={shown ? 'show' : 'hide'}
           onPoseComplete={() => {

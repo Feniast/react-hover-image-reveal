@@ -110,7 +110,7 @@ export default class TransitionEffect extends React.PureComponent {
       <Wrapper
         initialPose='initial'
         pose={shown ? 'show' : 'hide'}
-        className={styles.imgWrapper}
+        className={styles.imgWrapperNoOverflow}
         onPoseComplete={() => {
           if (shown) onShown && onShown();
           else onHidden && onHidden();
@@ -121,7 +121,7 @@ export default class TransitionEffect extends React.PureComponent {
           style={{ backgroundColor: bgColor }}
         />
         <ImgContainer
-          className={styles.imgContainer}
+          className={styles.imgContainerNoOverflow}
         >
           <Img src={imgSrc} className={styles.img} />
         </ImgContainer>

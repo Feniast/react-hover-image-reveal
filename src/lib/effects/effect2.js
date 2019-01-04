@@ -63,5 +63,5 @@ export default EffectFactory({
   containerStyles: { transformOrigin: '50% 100%' },
   imgStyles: { transformOrigin: '50% 100%' },
   hasWrapper: true,
-  wrapperClass: styles.imgWrapper
+  wrapperClass: styles.imgWrapperNoOverflow
 });

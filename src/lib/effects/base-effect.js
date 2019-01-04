@@ -6,8 +6,10 @@ import styles from './reveal.css';
 
 const EffectComponentFactory = ({
   containerConfig,
-  imgConfig,
+  containerClass = styles.imgContainerNoOverflow,
   containerStyles,
+  imgConfig,
+  imgClass = styles.img,
   imgStyles,
   hasWrapper,
   wrapperConfig,
@@ -53,10 +55,10 @@ const EffectComponentFactory = ({
       const content = (
         <ImgContainer
           style={containerStyles}
-          className={styles.imgContainer}
+          className={containerClass}
           {...(hasWrapper ? {} : poseConfig)}
         >
-          <Img src={imgSrc} style={imgStyles} className={styles.img} />
+          <Img src={imgSrc} style={imgStyles} className={imgClass} />
         </ImgContainer>
       );
       return hasWrapper ? (

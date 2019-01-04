@@ -4,7 +4,7 @@ import ImageReveal from 'react-hover-image-reveal';
 
 const images = ['./assets/1.jpg', './assets/2.jpg'];
 
-const effectNum = 5;
+const effectNum = 6;
 
 const extraPropsMap = {
   1: {
@@ -20,6 +20,9 @@ const extraPropsMap = {
     bgColor: 'black'
   },
   5: {
+    bgColor: 'white'
+  },
+  6: {
     bgColor: 'white'
   }
 };

@@ -197,7 +197,7 @@ export default class HoverImageReveal extends Component {
             <Effect
               shown={shown}
               onShown={this.onShown}
-              // onHidden={this.onHidden}
+              onHidden={this.onHidden}
               {...rest}
             />
           </div>,
