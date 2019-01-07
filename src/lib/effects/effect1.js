@@ -1,6 +1,7 @@
 import EffectFactory from './base-effect';
 import { sineEaseOut } from './cubic-bezier';
 import { createTransitionConfig } from '../util';
+import { registerEffect } from './effectMap';
 
 const transitionConfig = {
   duration: 200,
@@ -27,7 +28,9 @@ const imgConfig = {
   }
 };
 
-export default EffectFactory({
+const effect = EffectFactory({
   containerConfig,
   imgConfig
 });
+
+registerEffect('1', effect);

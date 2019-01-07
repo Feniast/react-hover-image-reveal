@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import memoize from 'lodash.memoize';
-import Effect from './effects';
+import Effect, { getEffectConfig } from './effects';
 
 const wrapFunc = (func, oldFunc) => {
   return (...args) => {
@@ -46,7 +46,7 @@ export default class HoverImageReveal extends Component {
     tag: PropTypes.string,
     className: PropTypes.string,
     children: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
-    position: PropTypes.oneOf(['top-left', 'bottom-left', 'top-right', 'bottom-right']),
+    position: PropTypes.oneOf(['top-left', 'bottom-left', 'top-right', 'bottom-right', 'center']),
     imgWrapperClass: PropTypes.string,
     imgSrc: PropTypes.string.isRequired,
     width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -105,6 +105,12 @@ export default class HoverImageReveal extends Component {
     const { clientX, clientY } = event;
     const { position } = this.props;
     switch (position) {
+      case 'center':
+        return {
+          x: `${clientX}px`,
+          y: `${clientY}px`,
+          transform: 'translate(-50%, -50%)'
+        }
       case 'top-left':
         return {
           x: `${clientX - 20}px`,
@@ -133,8 +139,12 @@ export default class HoverImageReveal extends Component {
   }
 
   getZIndex() {
-    const { zIndex } = this.props;
+    const { zIndex, effect } = this.props;
     const { visible } = this.state;
+    const effectConfig = getEffectConfig(effect) || {};
+    if (effectConfig.zIndex != null) {
+      return effectConfig.zIndex;
+    }
     switch (visible) {
       case VISIBLE_STATE.ENTER:
       case VISIBLE_STATE.SHOWN:

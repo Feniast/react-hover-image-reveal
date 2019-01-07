@@ -56,3 +56,15 @@ export const createTransitionConfig = (obj, transition) => {
   }
   return config;
 };
+
+export const mergeTransitionConfig = (...cfgs) => {
+  const mergedTransition = cfgs.reduce((assembly, cfg) => {
+    if (!cfg) return assembly;
+    return Object.assign(assembly, cfg.transition || {});
+  }, {});
+  const mergedConfig = cfgs.reduce((assembly, cfg) => {
+    return Object.assign(assembly, cfg);
+  }, {});
+  mergedConfig.transition = mergedTransition;
+  return mergedConfig;
+};

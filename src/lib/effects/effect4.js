@@ -3,6 +3,7 @@ import posed from 'react-pose';
 import { propsWithDeco, defaultPropsWithDeco } from './props';
 import { expoEaseOut } from './cubic-bezier';
 import { createTransitionConfig } from '../util';
+import { registerEffect } from './effectMap';
 
 import styles from './reveal.css';
 
@@ -57,7 +58,7 @@ const Img = posed.img({
   hide: {}
 });
 
-export default class TransitionEffect extends React.PureComponent {
+class TransitionEffect extends React.PureComponent {
   static propTypes = propsWithDeco;
 
   static defaultProps = defaultPropsWithDeco;
@@ -87,3 +88,5 @@ export default class TransitionEffect extends React.PureComponent {
     );
   }
 }
+
+registerEffect('4', TransitionEffect);

@@ -1,6 +1,7 @@
 import EffectFactory from './base-effect';
 import { expoEaseOut } from './cubic-bezier';
 import { injectTransition, createTransitionConfig } from '../util';
+import { registerEffect } from './effectMap';
 
 import styles from './reveal.css';
 
@@ -57,7 +58,7 @@ const imgConfig = {
   }
 };
 
-export default EffectFactory({
+const effect = EffectFactory({
   containerConfig,
   imgConfig,
   containerStyles: { transformOrigin: '50% 100%' },
@@ -65,3 +66,5 @@ export default EffectFactory({
   hasWrapper: true,
   wrapperClass: styles.imgWrapperNoOverflow
 });
+
+registerEffect('2', effect);

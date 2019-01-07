@@ -1,20 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Effect1 from './effect1';
-import Effect2 from './effect2';
-import Effect3 from './effect3';
-import Effect4 from './effect4';
-import Effect5 from './effect5';
-import Effect6 from './effect6';
-
-const effectMap = {
-  1: Effect1,
-  2: Effect2,
-  3: Effect3,
-  4: Effect4,
-  5: Effect5,
-  6: Effect6
-};
+import { getEffectComponent, getEffectConfig } from './effectMap';
+import './effect1'
+import './effect2'
+import './effect3'
+import './effect4'
+import './effect5'
+import './effect6'
+import './effect7'
 
 class Effect extends React.PureComponent {
   static propTypes = {
@@ -23,9 +16,14 @@ class Effect extends React.PureComponent {
 
   render() {
     const { effect, ...rest } = this.props;
-    const EffectComp = effectMap[effect] || effectMap['1'];
+    const EffectComp = getEffectComponent(effect);
+    if (!EffectComp) return null;
     return <EffectComp {...rest} />
   }
 }
 
 export default Effect;
+
+export {
+  getEffectConfig
+};
