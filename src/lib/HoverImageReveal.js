@@ -3,16 +3,13 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import memoize from 'lodash.memoize';
 import Effect, { getEffectConfig } from './effects';
+import { isNumberLike } from './util';
 
 const wrapFunc = (func, oldFunc) => {
   return (...args) => {
     if (oldFunc) oldFunc(...args);
     if (func) func(...args);
   };
-};
-
-const isNumberLike = value => {
-  return (typeof value === 'number' && !isNaN(value)) || /^\d+$/.test(value);
 };
 
 const portalRoot = document.createElement('div');

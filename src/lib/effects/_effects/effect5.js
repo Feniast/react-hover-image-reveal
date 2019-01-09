@@ -1,19 +1,18 @@
-import React from 'react';
-import posed from 'react-pose';
-import { propsWithDeco, defaultPropsWithDeco } from './props';
-import { expoEaseOut, sineEaseOut, quintEaseOut } from './cubic-bezier';
-import { easeSineOut, easeExpoOut } from './easing';
-import { createTransitionConfig } from '../util';
-import { registerEffect } from './effectMap';
+import AnimEffectFactory from '../effect-factory';
+import { propsWithDeco, defaultPropsWithDeco } from '../props';
+import { expoEaseOut, sineEaseOut, quintEaseOut } from '../cubic-bezier';
+import { easeSineOut, easeExpoOut } from '../easing';
+import { createTransitionConfig } from '../../util';
+import { registerEffect } from '../effectMap';
 
-import styles from './reveal.css';
+import styles from '../reveal.css';
 
 const leaveTransition = {
   duration: 100,
   ease: sineEaseOut
 };
 
-const Wrapper = posed.div({
+const wrapperConfig = {
   show: createTransitionConfig(
     {
       x: ['20%', '0%'],
@@ -24,9 +23,9 @@ const Wrapper = posed.div({
       ease: quintEaseOut
     }
   )
-});
+};
 
-const Bg = posed.div({
+const bgConfig = {
   show: {
     scaleX: 0,
     originX: '100%',
@@ -53,11 +52,10 @@ const Bg = posed.div({
         };
       }
     }
-  },
-  hide: {}
-});
+  }
+};
 
-const ImgContainer = posed.div({
+const imgContainerConfig = {
   initial: { x: '100%' },
   show: createTransitionConfig(
     {
@@ -73,9 +71,9 @@ const ImgContainer = posed.div({
     x: '-100%',
     transition: leaveTransition
   }
-});
+};
 
-const Img = posed.img({
+const imgConfig = {
   show: {
     x: '0%',
     scale: 1,
@@ -98,36 +96,43 @@ const Img = posed.img({
     x: '100%',
     transition: leaveTransition
   }
+};
+
+const effect = AnimEffectFactory({
+  initialPose: 'initial',
+  pose: props => (props.shown ? 'show' : 'hide'),
+  component: {
+    type: 'div',
+    className: styles.imgWrapperNoOverflow,
+    config: wrapperConfig,
+    children: [
+      {
+        type: 'div',
+        className: styles.imgBg,
+        style: (props) => ({
+          backgroundColor: props.bgColor
+        }),
+        config: bgConfig
+      },
+      {
+        type: 'div',
+        className: styles.imgContainerNoOverflow,
+        config: imgContainerConfig,
+        children: [
+          {
+            type: 'img',
+            config: imgConfig,
+            className: styles.img,
+            props: props => ({
+              src: props.imgSrc
+            })
+          }
+        ]
+      }
+    ]
+  },
+  propTypes: propsWithDeco,
+  defaultProps: defaultPropsWithDeco
 });
-class TransitionEffect extends React.PureComponent {
-  static propTypes = propsWithDeco;
 
-  static defaultProps = defaultPropsWithDeco;
-
-  render() {
-    const { shown, bgColor, onShown, onHidden, imgSrc } = this.props;
-    return (
-      <Wrapper
-        initialPose='initial'
-        pose={shown ? 'show' : 'hide'}
-        className={styles.imgWrapperNoOverflow}
-        onPoseComplete={() => {
-          if (shown) onShown && onShown();
-          else onHidden && onHidden();
-        }}
-      >
-        <Bg
-          className={styles.imgBg}
-          style={{ backgroundColor: bgColor }}
-        />
-        <ImgContainer
-          className={styles.imgContainerNoOverflow}
-        >
-          <Img src={imgSrc} className={styles.img} />
-        </ImgContainer>
-      </Wrapper>
-    );
-  }
-}
-
-registerEffect('5', TransitionEffect);
+registerEffect('5', effect);

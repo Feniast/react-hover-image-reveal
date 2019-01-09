@@ -1,9 +1,9 @@
-import EffectFactory from './base-effect';
-import { expoEaseOut } from './cubic-bezier';
-import { injectTransition, createTransitionConfig } from '../util';
-import { registerEffect } from './effectMap';
+import AnimEffectFactory from '../effect-factory';
+import { expoEaseOut } from '../cubic-bezier';
+import { injectTransition, createTransitionConfig } from '../../util';
+import { registerEffect } from '../effectMap';
 
-import styles from './reveal.css';
+import styles from '../reveal.css';
 
 const containerEnterTransition = {
   duration: 400,
@@ -58,13 +58,32 @@ const imgConfig = {
   }
 };
 
-const effect = EffectFactory({
-  containerConfig,
-  imgConfig,
-  containerStyles: { transformOrigin: '50% 100%' },
-  imgStyles: { transformOrigin: '50% 100%' },
-  hasWrapper: true,
-  wrapperClass: styles.imgWrapperNoOverflow
+const effect = AnimEffectFactory({
+  initialPose: 'initial',
+  pose: props => (props.shown ? 'show' : 'hide'),
+  component: {
+    type: 'div',
+    className: styles.imgWrapperNoOverflow,
+    children: [
+      {
+        type: 'div',
+        className: styles.imgContainerNoOverflow,
+        style: { transformOrigin: '50% 100%' },
+        config: containerConfig,
+        children: [
+          {
+            type: 'img',
+            className: styles.img,
+            style: { transformOrigin: '50% 100%' },
+            config: imgConfig,
+            props: props => ({
+              src: props.imgSrc
+            })
+          }
+        ]
+      }
+    ]
+  }
 });
 
 registerEffect('2', effect);

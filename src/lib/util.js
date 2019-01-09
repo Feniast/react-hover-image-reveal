@@ -1,5 +1,7 @@
 export const isNumber = value => Object.prototype.toString.call(value) === '[object Number]';
 
+export const isFunction = value => Object.prototype.toString.call(value) === '[object Function]';
+
 export const isNumberLike = value => {
   return (typeof value === 'number' && !isNaN(value)) || /^\d+$/.test(value);
 };
@@ -29,6 +31,20 @@ export const inverseNumber = (obj) => {
   return obj;
 };
 
+export const toArray = (obj) => {
+  return Array.isArray(obj) ? obj : [obj];
+}
+
+export const pick = (obj, keys) => {
+  if (!obj || typeof obj !== 'object') return {};
+  return toArray(keys).reduce((o, key) => {
+    if (obj.hasOwnProperty(key)) {
+      o[key] = obj[key];
+    }
+    return o;
+  }, {});
+}
+
 export const injectTransition = (obj, transition) => {
   for (let key in obj) {
     obj[key] = Object.assign({}, obj[key], transition);
@@ -47,6 +63,7 @@ export const createTransitionConfig = (obj, transition) => {
       config[key] = to;
       config.transition[key] = {
         from,
+        to,
         ...transition
       }
     } else {
